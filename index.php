@@ -1,11 +1,15 @@
 <?php
    include 'conn.inc.php';
-   session_start();
 ?>
 
 <html>
    <head>
-      <title>HOMEPAGE</title>
+     <title>HOMEPAGE</title>
+     <script type="text/javascript">
+       function erroreCampi() {
+         alert("RIEMPIRE TUTTI I CAMPI");
+       }
+     </script>
    </head>
    <body>
       <br>
@@ -15,54 +19,52 @@
       <br>
       <br>
       <br>
-      <center>
-         <form action="/" method="POST">
+      <left>
+         <form action="" method="POST">
             Nome : <input type="text" name="nome">
             <br>
             <br>
             <select name="argomento">
-               <option value="Prova">Prova</option>
+              <?php
+                $connessione = new mysqli("localhost","root","","post");
+                $query = $connessione->query("SELECT * FROM generi");
+                while($row = $query->fetch_row()) {
+                  echo "<option value=".$row[0].">".$row[1]."</option>";
+                }
+              ?>
             </select>
             <br>
             <br>
             Commento
             <br>
             <textarea name="commento" rows="5" cols="30"></textarea>
+           <br>
+           <br>
+           <input type="submit" name="invia" value ="INVIA">
          </form>
-         <br>
-         <input type="submit" name="invia" value ="INVIA" align="left">
-      </center>
+      </left>
       
       <?php
          if(isset($_POST['nome'])) {
             try {
-               $connessione = new PDO('mysql:host=' . $host . ';dbname=' . $database, $username, $password);
-               
-               if($_POST['nome']== "" OR $_POST['commento'] == "") {
-                  echo 'Riempire tutti i campi !';
+              $connessione = new mysqli("localhost","root","","post");
+              $nome = $_POST['nome'];
+              $argomento = $_POST['argomento'];
+              $commento = $_POST['commento'];
+              $sql = "INSERT INTO commenti(idUtente, Nome, Genere, Commento, idGenere) VALUES('1', '".$nome."','".$argomento."','".$commento."','1')";
+              $connessione->query($sql);
+              
+               if($_POST['nome'] == "" OR $_POST['commento'] == "") {
+                 echo '<script type="text/javascript">erroreCampi();</script>';
                } 
                else {
-                  $stm = $connessione->prepare("INSERT INTO commenti(Nome, Argomento, Commento) VALUES(:nome, :argomento, :commento)");
-                  $stm->bindValue(':nome', $_POST['nome']);
-                  $stm->bindValue(':argomento', $_POST['argomento']);
-                  $stm->bindValue(':commento', $_POST['commento']);
-                  $stm->execute();
-                  
-                  if($stm->errorCode() == 0) {
-                     echo 'Grazie per aver commentato !';
-                  }
-                  else {
-                     echo 'Errore !';
-                  }
                }
             }
             catch(PDOExcpetion $e) {
                echo 'Errore';
             }
          }
-      ?>
-      
-      
+      ?>  
    </body>
 </html>
 
