@@ -1,5 +1,7 @@
 <?php
    include 'conn.inc.php';
+   session_start();
+   $_SESSION['id'] = 0;
 ?>
 
 <html>
@@ -51,13 +53,14 @@
               $nome = $_POST['nome'];
               $argomento = $_POST['argomento'];
               $commento = $_POST['commento'];
-              $sql = "INSERT INTO commenti(idUtente, Nome, Genere, Commento, idGenere) VALUES('1', '".$nome."','".$argomento."','".$commento."','1')";
+              $sql = "INSERT INTO commenti(idUtente, Nome, Genere, Commento, idGenere) VALUES('".$_SESSION['id']."', '".$nome."','".$argomento."','".$commento."','1')";
               $connessione->query($sql);
               
                if($_POST['nome'] == "" OR $_POST['commento'] == "") {
                  echo '<script type="text/javascript">erroreCampi();</script>';
                } 
                else {
+                 $_SESSION['id']++;
                }
             }
             catch(PDOExcpetion $e) {
